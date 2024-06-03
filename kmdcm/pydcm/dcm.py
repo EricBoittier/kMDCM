@@ -420,6 +420,6 @@ if __name__ == "__main__":
         outfn = esp + "_" + fname + "_" + uuid + ".xyz"
         # rename the file
         os.rename(esp + ".mdcm.xyz", outfn)
-        np.save(outfn, cxyz)
+        # np.save(outfn, cxyz)
         print("Saved global charges to:", outfn)
         print("RMSE:", rmse)
