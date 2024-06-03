@@ -96,13 +96,6 @@ class kMDCM_Experiments(unittest.TestCase):
         if scan_fdns is None:
             scan_fdns = [densform]
 
-        if mdcm_cxyz is None:
-            mdcm_cxyz = FFE_PATH / "ff_energy/pydcm/sources/" "dcm8.xyz"
-        if mdcm_clcl is None:
-            mdcm_clcl = FFE_PATH / "ff_energy/pydcm/sources/" "dcm.mdcm"
-
-        print(scan_fesp)
-        print(scan_fdns)
 
         return mdcm_set_up(
             scan_fesp,
@@ -112,16 +105,6 @@ class kMDCM_Experiments(unittest.TestCase):
             mdcm_clcl=mdcm_clcl,
         )
 
-    def test_dcm_fortran(self):
-        m = mdcm_set_up(
-            scan_fesp,
-            scan_fdns,
-            local_pos=local_pos,
-            mdcm_cxyz=mdcm_cxyz,
-            mdcm_clcl=mdcm_clcl,
-        )
-        print(m.get_rmse())
-        optimize_mdcm(m, m.mdcm_clcl, "", "test")
 
     def test_load_data(
             self,
@@ -144,15 +127,6 @@ class kMDCM_Experiments(unittest.TestCase):
             PICKLES = list(Path(f"{FFE_PATH}/cubes/clcl/{l2}").glob("*clcl.obj"))
         else:
             PICKLES = list(Path(pickle_path).glob("*"))
-            
-
-#        if uuid is not None:
-#            PICKLES = list(
-#                Path(f"{FFE_PATH}/ff_energy/pydcm/tests/pkls/{uuid}").glob("*pkl"))
-#            if len(PICKLES) == 0:
-#                P = Path(f"{FFE_PATH}/cubes/clcl/{fname}/{uuid}")
-#                print(P)
-#                PICKLES = list(P.glob("*obj"))
 
         scanpath = Path(cube_path)
         chosen_points = []
@@ -168,42 +142,23 @@ class kMDCM_Experiments(unittest.TestCase):
             for i, c in enumerate(chosen_points)
         ]
 
-        # here we have two lists of files, one for cubes and one for pickles
-        # there will always be n cube files and m x n pickle files, where n is the
-        # number of conformations and m is the number of times an optimization has
-        # been run
-        def sort_rmse(x):
-            return x
-
         # make the cube and pickle lists the same, keeping the order based on
-        # print(PICKLES)
         # the cube list
         pkls = []
         print("PICKLES:", PICKLES)
         for _ in chosen_points:
-            print(_)
-            # tmp_pkl = [x for x in PICKLES if "_".join(_.split("_")[:3])[1:] in x.name]
             tmp_pkl = [x for x in PICKLES if _.__contains__(str(x.stem).split(".")[0])]
-            # print(x.name)
-            # print(tmp_pkl)
-
-            tmp_pkl.sort(key=sort_rmse)
             pkls.append(tmp_pkl[0])
 
         PICKLES = pkls
 
-        # print("CUBES:", CUBES[::100])
-        # print("PICKLES:", PICKLES[::100])
-        print("n cubes:", len(CUBES))
-        print("n pickles:", len(PICKLES))
         #  they must be the same length
         assert len(CUBES) == len(PICKLES)
+        assert len(CUBES) > 0
         # sort them
         import re
         def clean_non_alpha(x):
-            print(x)
             x = re.sub("[^0-9]", "", x)
-            # print(x)
             return int(x)
 
         CUBES.sort(key=lambda x: clean_non_alpha(str(x.stem)))
@@ -234,17 +189,6 @@ class kMDCM_Experiments(unittest.TestCase):
         :return:
         """
 
-        if cubes_pwd is None:
-            cube_paths = Path(f"{FFE_PATH}/cubes/dcm/")
-        print("cubes", len(cubes))
-        # print("cubes path", cube_paths)
-        # ecube_files = list(cube_paths.glob("*/*esp.cube"))
-        # dcube_files = list(cube_paths.glob("*/*dens.cube"))
-        ecube_files = cubes
-        dcube_files = cubes
-        print("ecube", len(ecube_files))
-        print("dcube", len(dcube_files))
-        # print(len(cubes), len(pickles))
         rmses = eval_kernel(
             files,
             cubes,
@@ -260,78 +204,6 @@ class kMDCM_Experiments(unittest.TestCase):
         pd.DataFrame({"rmses": rmses, "filename": files}).to_csv(
             f"{fname}_standard_.csv"
         )
-
-    def test_mdcm_standard_csv(self):
-        fname = "methanol_perm"
-        mdcm_dict = MDCM(fname + ".json").asDict()
-        print(mdcm_dict)
-        print(" " * 20, "Eval Null", "*" * 20)
-        if len(mdcm_dict["scan_fesp"]) > 0:
-            self.test_standard_rmse(
-                None,
-                mdcm_dict["scan_fesp"],
-                mdcm_dict["scan_fdns"],
-                mdcm_dict=mdcm_dict,
-                fname=fname,
-            )
-
-    def test_standard(self):
-        """ """
-        self.test_fit(alpha=1e-5, l2="1.0", n_factor=4, load_data=False)
-
-    def test_water(self):
-        waterpath = Path(f"{FFE_PATH}/ff_energy/pydcm/water.json")
-        water = MDCM(str(waterpath))
-        self.test_fit(
-            alpha=1e-5,
-            l2="1.0",
-            n_factor=4,
-            load_data=False,
-            mdcm_dict=water,
-            do_optimize=False,
-            fname="water",
-            natoms=3,
-        )
-
-    def test_methanol(self):
-        path = Path(f"{FFE_PATH}/ff_energy/pydcm/methanol.json")
-        m = MDCM(str(path))
-        self.test_fit(
-            alpha=1e-5,
-            l2="1.0",
-            n_factor=4,
-            load_data=False,
-            mdcm_dict=m,
-            do_optimize=True,
-            fname="methanol",
-            natoms=6,
-            do_null=True,
-        )
-
-    def test_methanol_perm(self):
-        path = Path(f"{FFE_PATH}/ff_energy/pydcm/tests/methanol_perm.json")
-        m = MDCM(str(path))
-        self.test_fit(
-            alpha=1e-5,
-            l2="1.0",
-            n_factor=4,
-            load_data=False,
-            mdcm_dict=m,
-            do_optimize=True,
-            fname="methanol_perm",
-            natoms=6,
-            do_null=True,
-        )
-
-    def experiments(self):
-        alphas = [0.0, 1.0e-4, 1.0e-3, 1.0e-2, 1.0e-1, 1]
-        l2s = [0.0, 0.1, 0.5, 1.0, 2.0, 4.0]
-        n_factors = [2, 4, 6, 8, 10, 12]
-        for alpha in alphas:
-            for l2 in l2s:
-                for n in n_factors:
-                    print("alpha", alpha, "l2", l2, "N_factors", n_factors)
-                    self.test_fit(alpha=alpha, l2=l2, n_factor=n)
 
     def test_N_repeats(self, n=1):
         for i in range(n):
@@ -374,14 +246,8 @@ class kMDCM_Experiments(unittest.TestCase):
             mdcm_dict["scan_fesp"] = [mdcm_dict["scan_fesp"][0]]
             mdcm_dict["scan_fdns"] = [mdcm_dict["scan_fdns"][0]]
 
-        print("n_cubes", len(ecube_files))
-        print("l2", l2)
-        print(ecube_files[::100])
-        print(dcube_files[::100])
         #  load mdcm object
         m = self.get_mdcm(mdcm_dict=mdcm_dict)
-        print("mdcm_clcl")
-        print(m.mdcm_clcl)
 
         #  kernel fit
         k = KernelFit()
@@ -402,17 +268,9 @@ class kMDCM_Experiments(unittest.TestCase):
                 mdcm_clcl=mdcm_dict["mdcm_clcl"],
                 mdcm_xyz=mdcm_dict["mdcm_cxyz"],
             )
-            print("Opt RMSEs:", opt_rmses)
+            # print("Opt RMSEs:", opt_rmses)
             opt_rmse = sum(opt_rmses) / len(opt_rmses)
             print("Opt RMSE:", opt_rmse)
-
-            # unload the data
-            #x, i, y, cubes, pickles = self.test_load_data(
-            #    l2=str(l2),
-            #    pickle_path=FFE_PATH / "cubes" / "clcl" / fname / f"{l2}",
-            #    cube_path=FFE_PATH / "cubes" / fname,
-            #    natoms=natoms,
-            #)
 
             uuid = k.uuid
 
@@ -443,9 +301,6 @@ class kMDCM_Experiments(unittest.TestCase):
             dcube_files = sorted(dcube_files, key=lambda x: clean_non_alpha(
                 str(Path(x).stem).split(".")[0]))
 
-            # for i in range(len(CUBES)):
-            #     assert clean_non_alpha(str(CUBES[i].stem)) == clean_non_alpha(str(PICKLES[i].stem).split("_")[0])
-
             if do_optimize:
                 print("doing opt::")
                 #  optimized model
@@ -461,7 +316,7 @@ class kMDCM_Experiments(unittest.TestCase):
                     l2=l2,
                     fname=fname,
                 )
-                print("Opt RMSEs:", opt_rmses)
+                # print("Opt RMSEs:", opt_rmses)
                 opt_rmse = sum(opt_rmses) / len(opt_rmses)
                 print("Opt RMSE:", opt_rmse)
 
@@ -471,7 +326,6 @@ class kMDCM_Experiments(unittest.TestCase):
                 pickle_path=FFE_PATH / "cubes" / "clcl" / fname / f"{uuid}",
                 cube_path=FFE_PATH / "cubes" / fname,
                 natoms=natoms,
-                # uuid=uuid
             )
 
             # all arrays should be the same length
@@ -493,7 +347,6 @@ class kMDCM_Experiments(unittest.TestCase):
         print("sum r2s test:", sum([_[0] for _ in k.r2s]))
         print("sum r2s train:", sum([_[1] for _ in k.r2s]))
         print("n models:", len(k.r2s))
-        print("r2s:", k.r2s)
 
         #   Move the local charges
         print("Moving clcls")
@@ -508,8 +361,6 @@ class kMDCM_Experiments(unittest.TestCase):
             self.test_standard_rmse(
                 k, files, cubes, pickles, mdcm_dict=mdcm_dict, fname=fname
             )
-
-        print("nfiles", len(files))
 
         do_k_opt = True if uuid else False
 
@@ -526,16 +377,14 @@ class kMDCM_Experiments(unittest.TestCase):
             mdcm_clcl=mdcm_dict["mdcm_clcl"],
             mdcm_xyz=mdcm_dict["mdcm_cxyz"],
             uuid=k.uuid,
-            # opt=do_k_opt,
             l2=l2,
             fname=fname,
         )
 
-        print("len(rmses):", len(rmses))
-
+        # print("len(rmses):", len(rmses))
         #  Printing the rmses
-        kern_rmse = self.print_rmse(rmses)
-        print("RMSEs:", rmses)
+        self.print_rmse(rmses)
+        # print("RMSEs:", rmses)
         self.prepare_df(k, rmses, files, alpha=alpha, l2=l2, fname=fname)
 
         if do_optimize is True:
@@ -545,14 +394,14 @@ class kMDCM_Experiments(unittest.TestCase):
 
         print("*" * 20, "Eval Kernel", "*" * 20)
         # plot fits
-        k.plot_fits(rmses)
-        k.plot_pca(rmses, title=f"Kernel ({kern_rmse:.2f})",
-                   name=f"kernel_{k.uuid}")
+        # k.plot_fits(rmses)
+        # k.plot_pca(rmses, title=f"Kernel ({kern_rmse:.2f})",
+        #            name=f"kernel_{k.uuid}")
 
-        #  plot optimized
-        if do_optimize is True:
-            print("opt rmses:", opt_rmses)
-            print("n_opt:", len(opt_rmses))
+        # #  plot optimized
+        # if do_optimize is True:
+        #     print("opt rmses:", opt_rmses)
+        #     print("n_opt:", len(opt_rmses))
 
         #  pickle kernel
         self.pickle_kernel(k)
@@ -562,7 +411,7 @@ class kMDCM_Experiments(unittest.TestCase):
         return k
 
     def print_rmse(self, rmses):
-        print("RMSEs:", rmses)
+        # print("RMSEs:", rmses)
         rmse = sum(rmses) / len(rmses)
         print("RMSE:", rmse)
         return rmse
@@ -593,26 +442,6 @@ class kMDCM_Experiments(unittest.TestCase):
         with open(p, "wb") as f:
             pickle.dump(k, f)
 
-    def test_files(self):
-        i = 4
-        l2 = 0.0
-        cube_paths = Path("/home/boittier/Documents/phd/ff_energy/cubes/dcm/scan")
-        ecube_files = list(cube_paths.glob("*esp.cube"))
-        dcube_files = list(cube_paths.glob("*dens.cube"))
-        print(len(ecube_files), len(dcube_files))
-        ecube_files.sort()
-        dcube_files.sort()
-        print(ecube_files[0], dcube_files[0])
-        #  name of the esp and dens cube files
-        e = str(ecube_files[i])
-        d = str(dcube_files[i])
-        #  set up the mdcm object
-        m = mdcm_set_up(
-            [e], [d], local_pos=local_pos, mdcm_cxyz=mdcm_cxyz, mdcm_clcl=mdcm_clcl
-        )
-        print("RMSE:", m.get_rmse())
-        outname = ecube_files[i].name + f"_{l2}"
-        optimize_mdcm(m, m.mdcm_clcl, "", outname, l2=l2)
 
 
 if __name__ == "__main__":
