@@ -145,7 +145,7 @@ class kMDCM_Experiments(unittest.TestCase):
         # make the cube and pickle lists the same, keeping the order based on
         # the cube list
         pkls = []
-        print("PICKLES:", PICKLES)
+        # print("PICKLES:", PICKLES)
         for _ in chosen_points:
             tmp_pkl = [x for x in PICKLES if _.__contains__(str(x.stem).split(".")[0])]
             pkls.append(tmp_pkl[0])
@@ -198,7 +198,7 @@ class kMDCM_Experiments(unittest.TestCase):
             mdcm_xyz=mdcm_dict["mdcm_cxyz"],
         )
 
-        print("RMSEs:", rmses)
+        # print("RMSEs:", rmses)
         rmse = sum(rmses) / len(rmses)
         print("RMSE:", rmse)
         pd.DataFrame({"rmses": rmses, "filename": files}).to_csv(
@@ -361,12 +361,6 @@ class kMDCM_Experiments(unittest.TestCase):
             self.test_standard_rmse(
                 k, files, cubes, pickles, mdcm_dict=mdcm_dict, fname=fname
             )
-
-        do_k_opt = True if uuid else False
-
-        print(files[:10])
-        print(ecube_files[:10])
-        print(ecube_files[:10])
 
         #  test the optimized model
         rmses = eval_kernel(

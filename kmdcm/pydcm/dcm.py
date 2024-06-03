@@ -24,14 +24,14 @@ print("FFE:", FFE_PATH)
 
 mdcm = dcm_fortran
 
-espform = FFE_PATH / "cubes/dcm/nms/" "test_nms_0_0.xyz_esp.cube"
-densform = FFE_PATH / "cubes/dcm/nms/" "test_nms_0_0.xyz_dens.cube"
+espform = FFE_PATH / "cubes/dcm/nms/test_nms_0_0.xyz_esp.cube"
+densform = FFE_PATH / "cubes/dcm/nms/test_nms_0_0.xyz_dens.cube"
 
 scan_fesp = [espform]
 scan_fdns = [densform]
 
-mdcm_cxyz = FFE_PATH / "ff_energy/pydcm/sources/" "dcm8.xyz"
-mdcm_clcl = FFE_PATH / "ff_energy/pydcm/sources/" "dcm.mdcm"
+mdcm_cxyz = FFE_PATH / "ff_energy/pydcm/sources/dcm8.xyz"
+mdcm_clcl = FFE_PATH / "ff_energy/pydcm/sources/dcm.mdcm"
 
 local_pos = None
 
@@ -59,16 +59,12 @@ def mdcm_set_up(scan_fesp, scan_fdns, mdcm_cxyz=None, mdcm_clcl=None, local_pos=
             ]
         )
     )
-    print("Nchars", Nchars)
-    print("Nfiles", Nfiles)
+
     esplist = np.empty((Nfiles, Nchars), dtype="U{:d}".format(Nchars), order="F")
     dnslist = np.empty((Nfiles, Nchars), dtype="U{:d}".format(Nchars), order="F")
     for ifle in range(Nfiles):
         esplist[ifle] = "{0:{1}s}".format(str(scan_fesp[ifle]), Nchars)
         dnslist[ifle] = "{0:{1}s}".format(str(scan_fdns[ifle]), Nchars)
-
-    print(esplist)
-    print(dnslist)
 
     # Load cube files, read MDCM global and local files
     mdcm.load_cube_files(Nfiles, Nchars, esplist.T, dnslist.T)
@@ -126,9 +122,8 @@ def optimize_mdcm(mdcm, clcl, outname, l2, fname, esp, eval_prev=False):
     print(uuid)
     print(rmse)
     print("clcl: ", clcl)
-    if eval_prev:
-        if eval_prev == uuid[4:]:
-            clcl = mdcm.mdcm_clcl
+    if eval_prev == uuid[4:]:
+        clcl = mdcm.mdcm_clcl
 
     #  save an array containing original charges
     charges = clcl.copy()
@@ -186,9 +181,9 @@ def optimize_mdcm(mdcm, clcl, outname, l2, fname, esp, eval_prev=False):
     on = outname.split("/")[-1]
 
     if not eval_prev:
-        obj_name = f"{FFE_PATH}/" f"cubes/clcl/{fname}/{l2}/{on}_clcl.obj"
+        obj_name = f"{FFE_PATH}/cubes/clcl/{fname}/{l2}/{on}_clcl.obj"
     else:
-        obj_name = f"{FFE_PATH}/" f"cubes/clcl/{fname}/{eval_prev}/{on}_clcl.obj"
+        obj_name = f"{FFE_PATH}/cubes/clcl/{fname}/{eval_prev}/{on}_clcl.obj"
 
     print(obj_name)
 
@@ -218,7 +213,6 @@ def eval_kernel(
         load_pkl=False,
         opt=False,
         l2=None,
-        verbose=True,
         fname=None,
         uuid=None,
 ):
