@@ -21,7 +21,7 @@ First, create the input json file. An example is given in "create_json_input.py"
 python kmdcm/pydcm/create_json.py
 ```
 
-To optimize the charges and fit the kernels, run the following command:
+To optimize the charges and fit the kernels, run the following command in the tests directory:
 ```bash
  python test_dcm.py --alpha 0.000001 --n_factor 8 --n_atoms 3  --l2 0.0 --json water_pbe0.json --fname water_pbe0 --do_opt
 ```
