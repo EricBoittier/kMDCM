@@ -1,0 +1,11 @@
+N
+C      1      dCN
+S      2      dSC        1      aSCN
+K      2      dKC        3      aKCS       1      dKCSN
+
+dCN = 1.19236
+dSC = 1.669
+aSCN = 180.000
+dKC = 2.875
+aKCS = 97.4
+dKCSN = 5.0

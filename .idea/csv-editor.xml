@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CsvFileAttributes">
+    <option name="attributeMap">
+      <map>
+        <entry key="/pydcm/tests/csvs/.ipynb_checkpoints/methanol_kernel_1a1c7166-76a0-44ba-b56a-7774d0dfa93b_0.001_2.0-checkpoint.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/pydcm/tests/csvs/.ipynb_checkpoints/methanol_kernel_5ad095d5-e396-42bf-bc45-3d4c726c3ea8_2.0_2.0-checkpoint.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/pydcm/tests/csvs/.ipynb_checkpoints/water_opt_fcafca45-0e5c-4efa-b0d8-32402f81d3de_4.0-checkpoint.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
