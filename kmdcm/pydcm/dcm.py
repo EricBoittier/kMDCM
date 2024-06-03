@@ -61,14 +61,14 @@ def mdcm_set_up(scan_fesp, scan_fdns, mdcm_cxyz=None, mdcm_clcl=None, local_pos=
     )
     print("Nchars", Nchars)
     print("Nfiles", Nfiles)
-    esplist = np.empty([Nfiles, Nchars], dtype="c")
-    dnslist = np.empty([Nfiles, Nchars], dtype="c")
+    esplist = np.empty((Nfiles, Nchars), dtype="U{:d}".format(Nchars), order="F")
+    dnslist = np.empty((Nfiles, Nchars), dtype="U{:d}".format(Nchars), order="F")
     for ifle in range(Nfiles):
         esplist[ifle] = "{0:{1}s}".format(str(scan_fesp[ifle]), Nchars)
         dnslist[ifle] = "{0:{1}s}".format(str(scan_fdns[ifle]), Nchars)
 
-    print(esplist.T)
-    print(dnslist.T)
+    print(esplist)
+    print(dnslist)
 
     # Load cube files, read MDCM global and local files
     mdcm.load_cube_files(Nfiles, Nchars, esplist.T, dnslist.T)

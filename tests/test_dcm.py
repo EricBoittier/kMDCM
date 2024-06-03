@@ -134,7 +134,7 @@ class kMDCM_Experiments(unittest.TestCase):
     ):
 
         print("Cube path:", cube_path)
-
+        print("Pickle path:", pickle_path)
         print(f"Loading data, uuid:{uuid}")
 
         if cube_path is None:
@@ -143,20 +143,21 @@ class kMDCM_Experiments(unittest.TestCase):
         if pickle_path is None:
             PICKLES = list(Path(f"{FFE_PATH}/cubes/clcl/{l2}").glob("*clcl.obj"))
         else:
-            PICKLES = list(Path(pickle_path).glob("*clcl.obj"))
+            PICKLES = list(Path(pickle_path).glob("*"))
+            
 
-        if uuid is not None:
-            PICKLES = list(
-                Path(f"{FFE_PATH}/ff_energy/pydcm/tests/pkls/{uuid}").glob("*pkl"))
-            if len(PICKLES) == 0:
-                P = Path(f"{FFE_PATH}/cubes/clcl/{fname}/{uuid}")
-                print(P)
-                PICKLES = list(P.glob("*obj"))
+#        if uuid is not None:
+#            PICKLES = list(
+#                Path(f"{FFE_PATH}/ff_energy/pydcm/tests/pkls/{uuid}").glob("*pkl"))
+#            if len(PICKLES) == 0:
+#                P = Path(f"{FFE_PATH}/cubes/clcl/{fname}/{uuid}")
+#                print(P)
+#                PICKLES = list(P.glob("*obj"))
 
         scanpath = Path(cube_path)
         chosen_points = []
         chosen_files = []
-        for c in scanpath.glob("*/*.p.cube"):
+        for c in scanpath.glob("*.p.cube"):
             ccode = c.name.split(".p.")[0]
             if ccode not in chosen_points:
                 chosen_points.append(ccode)
@@ -172,20 +173,17 @@ class kMDCM_Experiments(unittest.TestCase):
         # number of conformations and m is the number of times an optimization has
         # been run
         def sort_rmse(x):
-            spl = x.stem.split("_")
-            for i, _ in enumerate(spl):
-                if _ == "rmse":
-                    return float(spl[i + 1])
-            return x.stem
+            return x
 
         # make the cube and pickle lists the same, keeping the order based on
         # print(PICKLES)
         # the cube list
         pkls = []
+        print("PICKLES:", PICKLES)
         for _ in chosen_points:
-            # print(_)
+            print(_)
             # tmp_pkl = [x for x in PICKLES if "_".join(_.split("_")[:3])[1:] in x.name]
-            tmp_pkl = [x for x in PICKLES if str(x.stem).split(".")[0] == _]
+            tmp_pkl = [x for x in PICKLES if _.__contains__(str(x.stem).split(".")[0])]
             # print(x.name)
             # print(tmp_pkl)
 
@@ -203,16 +201,17 @@ class kMDCM_Experiments(unittest.TestCase):
         # sort them
         import re
         def clean_non_alpha(x):
+            print(x)
             x = re.sub("[^0-9]", "", x)
             # print(x)
             return int(x)
 
         CUBES.sort(key=lambda x: clean_non_alpha(str(x.stem)))
-        PICKLES.sort(key=lambda x: clean_non_alpha(str(x.stem).split("_")[0]))
+        PICKLES.sort(key=lambda x: clean_non_alpha(str(x.stem).split(".")[0]))
 
         for i in range(len(CUBES)):
             assert clean_non_alpha(str(CUBES[i].stem)) == clean_non_alpha(
-                str(PICKLES[i].stem).split("_")[0])
+                str(PICKLES[i].stem).split(".")[0])
 
         #  return the data
         return du.get_data(CUBES, PICKLES, natoms)
@@ -408,12 +407,14 @@ class kMDCM_Experiments(unittest.TestCase):
             print("Opt RMSE:", opt_rmse)
 
             # unload the data
-            x, i, y, cubes, pickles = self.test_load_data(
-                l2=str(l2),
-                pickle_path=FFE_PATH / "cubes" / "clcl" / fname / f"{l2}",
-                cube_path=FFE_PATH / "cubes" / fname,
-                natoms=natoms,
-            )
+            #x, i, y, cubes, pickles = self.test_load_data(
+            #    l2=str(l2),
+            #    pickle_path=FFE_PATH / "cubes" / "clcl" / fname / f"{l2}",
+            #    cube_path=FFE_PATH / "cubes" / fname,
+            #    natoms=natoms,
+            #)
+
+            uuid = k.uuid
 
         if uuid is not None:
             # k = pd.read_pickle()
@@ -436,11 +437,11 @@ class kMDCM_Experiments(unittest.TestCase):
 
             # CUBES.sort(key=lambda x: clean_non_alpha(str(x.stem)))
             pickles = sorted(pickles, key=lambda x: clean_non_alpha(
-                str(Path(x).stem).split("_")[0]))
+                str(Path(x).stem).split(".")[0]))
             ecube_files = sorted(ecube_files, key=lambda x: clean_non_alpha(
-                str(Path(x).stem).split("_")[0]))
+                str(Path(x).stem).split(".")[0]))
             dcube_files = sorted(dcube_files, key=lambda x: clean_non_alpha(
-                str(Path(x).stem).split("_")[0]))
+                str(Path(x).stem).split(".")[0]))
 
             # for i in range(len(CUBES)):
             #     assert clean_non_alpha(str(CUBES[i].stem)) == clean_non_alpha(str(PICKLES[i].stem).split("_")[0])

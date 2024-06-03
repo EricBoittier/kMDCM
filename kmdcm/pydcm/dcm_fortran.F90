@@ -352,6 +352,7 @@ module dcm_fortran
         real(rp), dimension(3)  :: forigin
         character(len=128)  :: ctmp
 
+        write(*, '(A)') "test:", file_cube
 
         if(verbose) write(*,'(A,I5)') "Reading '"//trim(file_cube)//"'..."//&
             " just atom number "
@@ -427,6 +428,7 @@ module dcm_fortran
         ! Coordinate system grid points
         integer :: fNgridX, fNgridY, fNgridZ
 
+        write(*, '(A)') "test:", file_cube
 
         if(verbose) write(*,'(A,I5)') "Reading '"//trim(file_cube)//"'..."//&
             " mode ", mode
