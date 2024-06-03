@@ -262,7 +262,6 @@ class kMDCM_Experiments(unittest.TestCase):
                 dcube_files,
                 opt=True,
                 l2=l2,
-                verbose=True,
                 fname=fname,
                 uuid=k.uuid,
                 mdcm_clcl=mdcm_dict["mdcm_clcl"],
