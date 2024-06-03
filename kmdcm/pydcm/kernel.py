@@ -2,16 +2,10 @@ import numpy as np
 import sklearn
 from sklearn.gaussian_process.kernels import RBF
 from sklearn.kernel_ridge import KernelRidge
-import matplotlib.pyplot as plt
-import pandas as pd
 import pickle
 import uuid
-from pathlib import Path
-from sklearn.decomposition import PCA
 from kmdcm.pydcm.dcm import get_clcl
 from pathlib import Path
-
-from sklearn.preprocessing import StandardScaler
 
 #  set seed for reproducibility
 np.random.seed(0)
@@ -88,8 +82,6 @@ class KernelFit:
         self.r2s = []
         self.test_results = []
         self.train_results = []
-        # self.X = None
-        # self.y = None
         self.X_train = None
         self.X_test = None
         self.y_train = None
