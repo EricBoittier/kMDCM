@@ -11,7 +11,7 @@ numpy==1.24.4
 packaging==24.0
 pandas==2.0.3
 pillow==10.3.0
-pycharmm==0.0.1
+#pycharmm==0.0.1
 pyparsing==3.1.2
 python-dateutil==2.9.0.post0
 pytz==2024.1
