@@ -1,9 +1,10 @@
 import json
 from pathlib import Path, PosixPath
+from kmdcm.pydcm.dcm import FFE_PATH, espform, densform
 
-FFEPATH = Path(__file__).parent.parent.parent
+FFEPATH = FFE_PATH #Path(__file__).parent.parent.parent
 
-print(FFEPATH)
+print("FFEPATH", FFEPATH)
 
 if __name__ == "__main__":
     """

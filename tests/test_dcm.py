@@ -101,6 +101,9 @@ class kMDCM_Experiments(unittest.TestCase):
         if mdcm_clcl is None:
             mdcm_clcl = FFE_PATH / "ff_energy/pydcm/sources/" "dcm.mdcm"
 
+        print(scan_fesp)
+        print(scan_fdns)
+
         return mdcm_set_up(
             scan_fesp,
             scan_fdns,
@@ -366,6 +369,7 @@ class kMDCM_Experiments(unittest.TestCase):
             mdcm_dict = mdcm_dict.asDict()
 
         if isinstance(mdcm_dict, dict):
+            print("mdcm_dict")
             ecube_files = mdcm_dict["scan_fesp"]
             dcube_files = mdcm_dict["scan_fdns"]
             mdcm_dict["scan_fesp"] = [mdcm_dict["scan_fesp"][0]]
@@ -374,6 +378,7 @@ class kMDCM_Experiments(unittest.TestCase):
         print("n_cubes", len(ecube_files))
         print("l2", l2)
         print(ecube_files[::100])
+        print(dcube_files[::100])
         #  load mdcm object
         m = self.get_mdcm(mdcm_dict=mdcm_dict)
         print("mdcm_clcl")
