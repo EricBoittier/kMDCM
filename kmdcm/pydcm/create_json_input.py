@@ -1,21 +1,17 @@
 import json
-from pathlib import Path, PosixPath
-from kmdcm.pydcm.dcm import FFE_PATH, espform, densform
+from pathlib import Path
+from kmdcm.pydcm.dcm import FFE_PATH
 
-FFEPATH = FFE_PATH #Path(__file__).parent.parent.parent
-
-print("FFEPATH", FFEPATH)
+print("FFEPATH:", FFE_PATH)
 
 if __name__ == "__main__":
     """
-    $$$                                                             $$$
     This script is used to generate the json files for the DCM models
-    $$$                                                            $$$
-    Water
+    Example for Water
     """
     water_dict = {}
     water_mdcm_path = Path(__file__).parents[0].resolve() / "sources" / "water"
-    water_cubes_path = FFEPATH / "cubes" / "water_pbe0"
+    water_cubes_path = FFE_PATH / "cubes" / "water_pbe0"
     print(water_cubes_path)
     water_dict["scan_fesp"] = [
         str(_) for _ in list(water_cubes_path.glob("*.p.cube"))
@@ -26,4 +22,4 @@ if __name__ == "__main__":
     ]
     water_dict["mdcm_cxyz"] = str(water_mdcm_path / "refined.xyz")
     water_dict["mdcm_clcl"] = str(water_mdcm_path / "pbe0_dz.mdcm")
-    json.dump(water_dict, open(FFEPATH / "tests/water_pbe0.json", "w"))
+    json.dump(water_dict, open(FFE_PATH / "tests/water_pbe0.json", "w"))
