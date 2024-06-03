@@ -7,6 +7,7 @@
 python3 -m venv kmdcm-env
 source kmdcm-env/bin/activate
 pip install -r requirements.txt
+export CFLAGS="-std=c99"
 ```
 ## Usage
 
