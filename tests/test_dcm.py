@@ -253,6 +253,11 @@ class kMDCM_Experiments(unittest.TestCase):
 
         # dp optimization
         if do_optimize and uuid is None:
+            ecube_files = sorted(ecube_files, key=lambda x: clean_non_alpha(
+                str(Path(x).stem).split(".")[0]))
+            dcube_files = sorted(dcube_files, key=lambda x: clean_non_alpha(
+                str(Path(x).stem).split(".")[0]))
+            
             print("*" * 80)
             print("Optimizing with l2=", l2)
             opt_rmses = eval_kernel(
@@ -278,10 +283,6 @@ class kMDCM_Experiments(unittest.TestCase):
                 natoms=natoms,
             )
             pickles = sorted(pickles, key=lambda x: clean_non_alpha(
-                str(Path(x).stem).split(".")[0]))
-            ecube_files = sorted(ecube_files, key=lambda x: clean_non_alpha(
-                str(Path(x).stem).split(".")[0]))
-            dcube_files = sorted(dcube_files, key=lambda x: clean_non_alpha(
                 str(Path(x).stem).split(".")[0]))
 
         if uuid is not None:
