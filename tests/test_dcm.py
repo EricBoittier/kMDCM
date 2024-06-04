@@ -40,6 +40,11 @@ def make_df_same_size(df_dict):
 PATH_TO_TESTDIR = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
+import re
+def clean_non_alpha(x):
+    x = re.sub("[^0-9]", "", x)
+    return int(x)
+
 def ignore_warnings(test_func):
     def do_test(self, *args, **kwargs):
         with warnings.catch_warnings():
@@ -137,7 +142,8 @@ class kMDCM_Experiments(unittest.TestCase):
         pkls = []
         # print("PICKLES:", PICKLES)
         for _ in chosen_points:
-            tmp_pkl = [x for x in PICKLES if _.__contains__(str(x.stem).split(".")[0])]
+            tmp_pkl = [x for x in PICKLES if str(Path(_).stem).split(".")[0] == str(x.stem).split(".")[0]]
+            #print(tmp_pkl)
             pkls.append(tmp_pkl[0])
 
         PICKLES = pkls
@@ -148,15 +154,18 @@ class kMDCM_Experiments(unittest.TestCase):
         # sort them
         import re
         def clean_non_alpha(x):
+            #print(x)
             x = re.sub("[^0-9]", "", x)
+            #print(x)
             return int(x)
 
-        CUBES.sort(key=lambda x: clean_non_alpha(str(x.stem)))
+        CUBES.sort(key=lambda x: clean_non_alpha(str(x.stem).split(".")[0]))
         PICKLES.sort(key=lambda x: clean_non_alpha(str(x.stem).split(".")[0]))
 
         for i in range(len(CUBES)):
-            assert clean_non_alpha(str(CUBES[i].stem)) == clean_non_alpha(
-                str(PICKLES[i].stem).split(".")[0])
+            #print(i, CUBES[i].stem, PICKLES[i].stem)
+            assert clean_non_alpha(str(CUBES[i].stem).split(".")[0]) == clean_non_alpha(
+                str(PICKLES[i].stem).split(".")[0]), f"{CUBES[i].stem} {PICKLES[i].stem}"
 
         #  return the data
         return du.get_data(CUBES, PICKLES, natoms)
@@ -261,6 +270,20 @@ class kMDCM_Experiments(unittest.TestCase):
             opt_rmse = sum(opt_rmses) / len(opt_rmses)
             print("Opt RMSE:", opt_rmse)
 
+            # unload the data
+            x, i, y, cubes, pickles = self.test_load_data(
+                l2=str(l2),
+                pickle_path=FFE_PATH / "cubes" / "clcl" / fname / f"{k.uuid}",
+                cube_path=FFE_PATH / "cubes" / fname,
+                natoms=natoms,
+            )
+            pickles = sorted(pickles, key=lambda x: clean_non_alpha(
+                str(Path(x).stem).split(".")[0]))
+            ecube_files = sorted(ecube_files, key=lambda x: clean_non_alpha(
+                str(Path(x).stem).split(".")[0]))
+            dcube_files = sorted(dcube_files, key=lambda x: clean_non_alpha(
+                str(Path(x).stem).split(".")[0]))
+
         if uuid is not None:
             # k = pd.read_pickle()
             # unload the data
@@ -273,12 +296,6 @@ class kMDCM_Experiments(unittest.TestCase):
                 fname=fname
             )
 
-            # sort them
-            import re
-            def clean_non_alpha(x):
-                x = re.sub("[^0-9]", "", x)
-                # print(x)
-                return int(x)
 
             # CUBES.sort(key=lambda x: clean_non_alpha(str(x.stem)))
             pickles = sorted(pickles, key=lambda x: clean_non_alpha(
@@ -361,13 +378,19 @@ class kMDCM_Experiments(unittest.TestCase):
 
         #  Printing the rmses
         self.print_rmse(rmses)
+        
         # print("RMSEs:", rmses)
-        self.prepare_df(k, rmses, files, alpha=alpha, l2=l2, fname=fname)
+        kern_df = self.prepare_df(k, rmses, files, alpha=alpha, l2=l2, fname=fname)
+        
+        print("test:", kern_df[kern_df["class"] == "test"]["rmse"].mean())
+        print("train:", kern_df[kern_df["class"] == "train"]["rmse"].mean())
 
         if do_optimize is True:
-            self.prepare_df(
+            opt_df = self.prepare_df(
                 k, opt_rmses, files, alpha=alpha, l2=l2, opt=True, fname=fname
             )
+            print("(opt) test:", opt_df[opt_df["class"] == "test"]["rmse"].mean())
+            print("(opt) train:", opt_df[opt_df["class"] == "train"]["rmse"].mean())
 
         print("*" * 20, "Eval Kernel", "*" * 20)
         #  pickle kernel
@@ -401,7 +424,9 @@ class kMDCM_Experiments(unittest.TestCase):
             "type": ["nms" if "nms" in str(_) else "scan" for _ in files],
         }
 
-        pd.DataFrame(make_df_same_size(df_dict)).to_csv(fn)
+        df = pd.DataFrame(make_df_same_size(df_dict))
+        df.to_csv(fn)
+        return df
 
     def pickle_kernel(self, k):
         p = PATH_TO_TESTDIR / f"models/kernel_{k.uuid}.pkl"
