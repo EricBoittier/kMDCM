@@ -88,7 +88,6 @@ class kMDCM_Experiments(unittest.TestCase):
         if scan_fdns is None:
             scan_fdns = [densform]
 
-
         return mdcm_set_up(
             scan_fesp,
             scan_fdns,
@@ -96,7 +95,6 @@ class kMDCM_Experiments(unittest.TestCase):
             mdcm_cxyz=mdcm_cxyz,
             mdcm_clcl=mdcm_clcl,
         )
-
 
     def test_load_data(
             self,
@@ -263,8 +261,6 @@ class kMDCM_Experiments(unittest.TestCase):
             opt_rmse = sum(opt_rmses) / len(opt_rmses)
             print("Opt RMSE:", opt_rmse)
 
-            uuid = k.uuid
-
         if uuid is not None:
             # k = pd.read_pickle()
             # unload the data
@@ -319,14 +315,12 @@ class kMDCM_Experiments(unittest.TestCase):
                 natoms=natoms,
             )
 
-            # all arrays should be the same length
+        uuid = k.uuid
+        # all arrays should be the same length
         assert len(x) == len(i) == len(y) == len(cubes) == len(pickles)
 
         k.set_data(x, i, y, cubes, pickles, fname=fname)
         k.fit(alpha=alpha, N_factor=n_factor, l2=l2)
-
-        if uuid is not None:
-            k.set_prev_uuid(uuid)
 
         # printing
         print("*" * 20, "Kernel Fit", "*" * 20)
@@ -342,7 +336,6 @@ class kMDCM_Experiments(unittest.TestCase):
         #   Move the local charges
         print("Moving clcls")
         files = k.move_clcls(m)
-        # files.sort()
         print("N files:", len(files), "\n")
 
         print("*" * 20, "Eval Results", "*" * 20)
@@ -366,7 +359,6 @@ class kMDCM_Experiments(unittest.TestCase):
             fname=fname,
         )
 
-        # print("len(rmses):", len(rmses))
         #  Printing the rmses
         self.print_rmse(rmses)
         # print("RMSEs:", rmses)
@@ -378,16 +370,6 @@ class kMDCM_Experiments(unittest.TestCase):
             )
 
         print("*" * 20, "Eval Kernel", "*" * 20)
-        # plot fits
-        # k.plot_fits(rmses)
-        # k.plot_pca(rmses, title=f"Kernel ({kern_rmse:.2f})",
-        #            name=f"kernel_{k.uuid}")
-
-        # #  plot optimized
-        # if do_optimize is True:
-        #     print("opt rmses:", opt_rmses)
-        #     print("n_opt:", len(opt_rmses))
-
         #  pickle kernel
         self.pickle_kernel(k)
         #  write manifest
@@ -426,7 +408,6 @@ class kMDCM_Experiments(unittest.TestCase):
         print("Pickling kernel to", p)
         with open(p, "wb") as f:
             pickle.dump(k, f)
-
 
 
 if __name__ == "__main__":
