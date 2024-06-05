@@ -21,11 +21,17 @@ First, create the input json file. An example is given in "create_json_input.py"
 python kmdcm/pydcm/create_json.py
 ```
 
-To optimize the charges and fit the kernels, run the following command in the tests directory:
+To optimize the charges and fit the kernels, run the following command in the "tests" directory:
+
+### Example 1: Water
 ```bash
  python test_dcm.py --alpha 0.000001 --n_factor 8 --n_atoms 3  --l2 0.0 --json water_pbe0.json --fname water_pbe0 --do_opt
 ```
-
+### Example 2: Methanol
+```bash
+python test_dcm.py --alpha 0.000001 --n_factor 16 --n_atoms 6  --l2 40.0 --json shaked-methanol.json --fname shaked-methanol --do_opt
+```
+### Keyword arguments
 - `--alpha` is the regularization parameter
 - `--n_factor` is the ratio between the test and training set
 - `--n_atoms` is the number of atoms in the molecule
