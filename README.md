@@ -1,5 +1,6 @@
 # Kernel-based Minimal Distributed Charge Models (kMDCM)
 
+<img src="images/kmdcm-methanol.gif" width="300" height="300" />
 
 ## Installation
 After cloning the repository, you can install the package by running the following commands:
@@ -39,3 +40,26 @@ python test_dcm.py --alpha 0.000001 --n_factor 16 --n_atoms 6  --l2 40.0 --json 
 - `--json` is the json file containing the filenames for fitting
 - `--fname` is the name of the job
 
+## Exporting kernel matrices to CHARMM
+To export the kernel matrices to CHARMM, run the following command:
+```bash
+python kmdcm/utils/save_charmm_input.py --kernel 4af4d6a1-a66c-4339-bafa-82db5e7529fc
+```
+This creates a directory in the tests/coeffs which stores the kernel coefficients ("coefs0.txt", etc.) and the reference distances ("x_fit.txt").
+
+```apex
+156 10 3 6
+acec8c45-bfe5-4acc-8574-925372ecb40d/x_fit.txt
+acec8c45-bfe5-4acc-8574-925372ecb40d/coefs0.txt
+...
+acec8c45-bfe5-4acc-8574-925372ecb40d/coefs29.txt
+```
+
+## Running kMDCM in CHARMM
+```fortran
+! 
+open unit 12 card read name @input/methanol.kern
+! regular MDCM input file
+open unit 10 card read name @input/10charges.dcm
+DCM KERN 12 IUDCM 10 TSHIFT 
+'''
